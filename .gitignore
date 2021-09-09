@@ -1,0 +1,74 @@
+# Repo-specific GitIgnore ----------------------------------------------------------------------------------------------
+*.mp4
+*.mov
+*.MOV
+*.avi
+*.data
+*.json
+*.cfg
+!cfg/yolov3*.cfg
+
+storage.googleapis.com
+runs/*
+data/*
+inference/*
+!data/hyps/*
+!data/images/zidane.jpg
+!data/images/bus.jpg
+!data/*.sh
+
+results*.csv
+
+# Datasets -------------------------------------------------------------------------------------------------------------
+coco/
+coco128/
+VOC/
+
+# MATLAB GitIgnore -----------------------------------------------------------------------------------------------------
+*.m~
+*.mat
+!targets*.mat
+
+# Neural Network weights -----------------------------------------------------------------------------------------------
+*.weights
+*.onnx
+
+# GitHub Python GitIgnore ----------------------------------------------------------------------------------------------
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+/wandb/
+.installed.cfg
+*.egg
+
+
+# virtualenv
+.venv*
+venv*/
+ENV*/
+
+
+
+
+
