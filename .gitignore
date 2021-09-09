@@ -1,5 +1,4 @@
 # Repo-specific GitIgnore ----------------------------------------------------------------------------------------------
-*.mp4
 *.mov
 *.MOV
 *.avi
@@ -11,7 +10,7 @@
 storage.googleapis.com
 runs/*
 data/*
-inference/*
+inference/output/*
 !data/hyps/*
 !data/images/zidane.jpg
 !data/images/bus.jpg
