@@ -27,6 +27,7 @@ class DeepSort(object):
         self.height, self.width = ori_img.shape[:2]
         # generate detections
         features = self._get_features(bbox_xywh, ori_img)
+        print("features: ", features)
         bbox_tlwh = self._xywh_to_tlwh(bbox_xywh)
         detections = [Detection(bbox_tlwh[i], conf, features[i]) for i, conf in enumerate(
             confidences) if conf > self.min_confidence]
@@ -55,7 +56,6 @@ class DeepSort(object):
     """
     TODO:
         Convert bbox from xc_yc_w_h to xtl_ytl_w_h
-    Thanks JieChen91@github.com for reporting this bug!
     """
     @staticmethod
     def _xywh_to_tlwh(bbox_xywh):

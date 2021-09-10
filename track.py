@@ -1,4 +1,5 @@
 import sys
+import numpy as np
 sys.path.insert(0, './yolov5')
 
 from yolov5.utils.google_utils import attempt_download
@@ -86,14 +87,13 @@ def detect():
     out = 'inference/output'
     source = 'demo.mp4'
     yolo_weights = 'best.pt'
-    deep_sort_weights = 'deep_sort_pytorch/deep_sort/deep/checkpoint/ckpt.t7'
     show_vid = True
     save_vid = True
     save_txt = True
     imgsz = 640
     evaluate = False
 
-    config_deepsort = 'deep_sort_pytorch/configs/deep_sort.yaml'
+    config_deepsort = 'deep_sort_pytorch/configs/deep_sort.yaml'  # deep_sort weights are configured here
     device = ''
     augment = False
     conf_thres=0.4
@@ -105,7 +105,7 @@ def detect():
     # initialize deepsort
     cfg = get_config()
     cfg.merge_from_file(config_deepsort)
-    # attempt_download(deep_sort_weights, repo='mikel-brostrom/Yolov5_DeepSort_Pytorch')
+    # attempt_download(deep_sort_weights, repo='mikel-brostrom/Yolov5_DeepSort_Pytorch')  # pretrained weights with coco
     deepsort = DeepSort(cfg.DEEPSORT.REID_CKPT,
                         max_dist=cfg.DEEPSORT.MAX_DIST, min_confidence=cfg.DEEPSORT.MIN_CONFIDENCE,
                         nms_max_overlap=cfg.DEEPSORT.NMS_MAX_OVERLAP, max_iou_distance=cfg.DEEPSORT.MAX_IOU_DISTANCE,
@@ -148,7 +148,7 @@ def detect():
 
     # Get names and colors
     names = model.module.names if hasattr(model, 'module') else model.names
-    print("@@@@@ names: ", names)
+    print("@@@@@ names: ", names)  # detection objects
 
     # Run inference
     if device.type != 'cpu':
@@ -172,11 +172,11 @@ def detect():
 
         # Inference
         t1 = time_synchronized()
-        pred = model(img, augment=augment)[0]
+        pred = model(img, augment=augment)[0]  # model prediction, filtering with a threshold
 
         # Apply NMS
         pred = non_max_suppression(
-            pred, conf_thres, iou_thres, classes=classes, agnostic=agnostic_nms)
+            pred, conf_thres, iou_thres, classes=classes, agnostic=agnostic_nms)  # filtering with IOU
         t2 = time_synchronized()
 
 
@@ -185,10 +185,10 @@ def detect():
             if webcam:  # batch_size >= 1
                 p, s, im0 = path[i], '%g: ' % i, im0s[i].copy()
             else:
-                p, s, im0 = path, '', im0s
+                p, s, im0 = path, '', im0s  # path: video path
 
-            s += '%gx%g ' % img.shape[2:]  # print string
-            save_path = str(Path(out) / Path(p).name)
+            s += '%gx%g ' % img.shape[2:]  # add image shape to string
+            save_path = str(Path(out) / Path(p).name)  # inference/output/demo.mp4
 
             if det is not None and len(det):
                 # Rescale boxes from img_size to im0 size
@@ -198,13 +198,13 @@ def detect():
                 # Print results
                 for c in det[:, -1].unique():
                     n = (det[:, -1] == c).sum()  # detections per class
-                    s += '%g %ss, ' % (n, names[int(c)])  # add to string
-
+                    s += '%g %ss, ' % (n, names[int(c)])  # add amount and detection class to string
+            
                 xywh_bboxs = []
                 confs = []
 
                 # Adapt detections to deep sort input format
-                for *xyxy, conf, cls in det:
+                for *xyxy, conf, cls in det:  # coordinates, confidence, class
                     # to deep sort format
                     x_c, y_c, bbox_w, bbox_h = xyxy_to_xywh(*xyxy)
                     xywh_obj = [x_c, y_c, bbox_w, bbox_h]
@@ -216,13 +216,14 @@ def detect():
 
                 # pass detections to deepsort
                 outputs = deepsort.update(xywhs, confss, im0)
+                # print("### deep sort outputs: ", outputs)
         
 
                 # draw boxes for visualization
                 if len(outputs) > 0:
                     bbox_xyxy = outputs[:, :4]
                     identities = outputs[:, -1]
-                    draw_boxes(im0, bbox_xyxy, identities)
+                    draw_boxes(im0, bbox_xyxy, identities)  # draw the boxes and IDs
                     # to MOT format
                     tlwh_bboxs = xyxy_to_tlwh(bbox_xyxy)
 
